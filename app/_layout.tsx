@@ -1,55 +1,77 @@
-import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { useColorScheme, View } from 'react-native';
+import { EmptyState } from '@/src/components/EmptyState';
+import { AppProvider, useApp } from '@/src/context/AppContext';
+import { useColors } from '@/src/theme/theme';
 
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
+  return (
+    <AppProvider fallback={(state, retry) => <BootScreen state={state} retry={retry} />}>
+      <RootNavigator />
+    </AppProvider>
+  );
 }
 
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+function BootScreen({ state, retry }: { state: 'loading' | 'error'; retry: () => void }) {
+  const c = useColors();
+  useEffect(() => {
+    if (state === 'error') SplashScreen.hide();
+  }, [state]);
+  if (state === 'loading') return null; // the splash screen stays up
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', padding: 24, backgroundColor: c.background }}>
+      <EmptyState
+        icon="alert-triangle"
+        title="Something went wrong"
+        message="Your tasks couldn't be loaded. They are still safe on this device."
+        actionLabel="Try again"
+        onAction={retry}
+      />
+    </View>
+  );
+}
+
+function RootNavigator() {
+  const { profile } = useApp();
+  const scheme = useColorScheme();
+  const c = useColors();
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navTheme = {
+    ...base,
+    colors: { ...base.colors, primary: c.primary, background: c.background, card: c.surface, text: c.text, border: c.border },
+  };
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+    <ThemeProvider value={navTheme}>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: c.background },
+          headerStyle: { backgroundColor: c.background },
+          headerShadowVisible: false,
+          headerTintColor: c.text,
+          headerTitleStyle: { fontWeight: '700' },
+        }}>
+        {/* First launch only: no profile yet. */}
+        <Stack.Protected guard={!profile}>
+          <Stack.Screen name="setup" options={{ title: 'Welcome to Faculty Flow' }} />
+        </Stack.Protected>
+        <Stack.Protected guard={!!profile}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="task/new" options={{ title: 'New task' }} />
+          <Stack.Screen name="task/[id]" options={{ title: 'Edit task' }} />
+          <Stack.Screen name="profile" options={{ title: 'Edit profile' }} />
+        </Stack.Protected>
       </Stack>
     </ThemeProvider>
   );

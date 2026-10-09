@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Full-screen alarm alert over the lock screen. On Android 14+ the user may need to allow it. -->
+  <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.VIBRATE" />
+
+  <application>
+    <activity
+      android:name="expo.modules.facultyalarm.AlarmActivity"
+      android:exported="false"
+      android:excludeFromRecents="true"
+      android:launchMode="singleTask"
+      android:taskAffinity="com.facultyflow.alarm"
+      android:showWhenLocked="true"
+      android:turnScreenOn="true"
+      android:screenOrientation="portrait"
+      android:theme="@android:style/Theme.Material.NoActionBar" />
+
+    <receiver android:name="expo.modules.facultyalarm.AlarmReceiver" android:exported="false" />
+
+    <receiver android:name="expo.modules.facultyalarm.AlarmBootReceiver" android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>
