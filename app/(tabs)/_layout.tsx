@@ -1,8 +1,8 @@
 import { router, Tabs } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { Icon } from '@/src/components/Icon';
 import { PillTabBar } from '@/src/components/PillTabBar';
-import { useColors } from '@/src/theme/theme';
+import { radius, space, useColors } from '@/src/theme/theme';
 
 export default function TabLayout() {
   const c = useColors();
@@ -24,11 +24,12 @@ export default function TabLayout() {
           headerRight: () => (
             <Pressable
               onPress={() => router.push('/export')}
-              style={styles.headerButton}
-              android_ripple={{ color: c.border, borderless: true }}
+              style={({ pressed }) => [styles.exportButton, { backgroundColor: c.primary, opacity: pressed ? 0.85 : 1 }]}
+              android_ripple={{ color: c.primarySoft }}
               accessibilityRole="button"
               accessibilityLabel="Export tasks to Excel">
-              <Icon name="download" size={22} color={c.text} />
+              <Icon name="download" size={20} color={c.onPrimary} />
+              <Text style={[styles.exportLabel, { color: c.onPrimary }]}>Export</Text>
             </Pressable>
           ),
         }}
@@ -39,5 +40,16 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  headerButton: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginRight: 4 },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    height: 44,
+    paddingHorizontal: space.lg,
+    marginRight: space.lg,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+    elevation: 2,
+  },
+  exportLabel: { fontSize: 15, fontWeight: '700' },
 });
