@@ -5,16 +5,6 @@ export const APP_NAME = 'Faculty Flow';
 
 export const REMINDER_CHANNEL_ID = 'reminders';
 
-export const DESIGNATIONS = [
-  'Teacher',
-  'Assistant Professor',
-  'Associate Professor',
-  'Professor',
-  'HOD',
-  'Faculty',
-  'Other',
-] as const;
-
 export interface Option<T> {
   value: T;
   label: string;

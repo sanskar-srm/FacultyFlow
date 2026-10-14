@@ -86,6 +86,11 @@ export function getCompletedTasks(limit = 100): Promise<Task[]> {
   return all('SELECT * FROM tasks WHERE completed = 1 ORDER BY completed_at DESC LIMIT ?', limit);
 }
 
+/** All tasks dated within [start, end] (inclusive), in date and time order. Used by Excel export. */
+export function getTasksInRange(start: string, end: string): Promise<Task[]> {
+  return all(`SELECT * FROM tasks WHERE scheduled_date BETWEEN ? AND ? ${ORDER}`, start, end);
+}
+
 /** Distinct dates in [start, end] that have at least one task. */
 export async function getDatesWithTasks(start: string, end: string): Promise<Set<string>> {
   const db = await getDb();

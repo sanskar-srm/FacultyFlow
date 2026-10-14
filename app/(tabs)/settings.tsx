@@ -233,6 +233,16 @@ export default function SettingsScreen() {
         </>
       ) : null}
 
+      <ListGroup title="Data">
+        <ListRow
+          icon="download"
+          label="Export to Excel"
+          detail="Save tasks for a day, week, month or custom period as an Excel sheet and share it."
+          onPress={() => router.push('/export')}
+          chevron
+        />
+      </ListGroup>
+
       <ListGroup title="Appearance">
         {THEME_OPTIONS.map((o) => (
           <RadioRow

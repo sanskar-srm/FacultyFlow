@@ -71,6 +71,8 @@ function RootNavigator() {
           <Stack.Screen name="task/new" options={{ title: 'New task' }} />
           <Stack.Screen name="task/[id]" options={{ title: 'Edit task' }} />
           <Stack.Screen name="profile" options={{ title: 'Edit profile' }} />
+          <Stack.Screen name="export" options={{ title: 'Export to Excel' }} />
+          <Stack.Screen name="export-result" options={{ title: 'Excel sheet' }} />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>
